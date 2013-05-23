@@ -70,4 +70,20 @@ describe AggregateRoot do
       TwoDependant.new
     end
   end
+
+  context "model with alternate class" do
+    class AlternateClass
+      include AggregateRoot
+
+      aggregates :component_one, model_class: ComponentTwo
+    end
+
+    it "uses the correct class to instantiate the model" do
+      ComponentOne.should_not_receive(:new)
+      ComponentTwo.should_receive(:new).
+        with(title: "Title")
+
+      AlternateClass.new(component_one_title: "Title")
+    end
+  end
 end
