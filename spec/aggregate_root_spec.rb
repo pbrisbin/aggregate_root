@@ -5,7 +5,7 @@ describe AggregateRoot do
   class ComponentTwo; end
   class ComponentThree; end
 
-  context "simple models" do
+  context "of simple models" do
     class Simple
       include AggregateRoot
 
@@ -13,7 +13,7 @@ describe AggregateRoot do
       aggregates :component_two
     end
 
-    it "initializes its components" do
+    it "initializes its components from prefixed attributes" do
       ComponentOne.should_receive(:new).
         with(title: "Title", description: "Description")
       ComponentTwo.should_receive(:new).
@@ -28,7 +28,7 @@ describe AggregateRoot do
     end
   end
 
-  context "one related model" do
+  context "with one model related to another" do
     class Dependant
       include AggregateRoot
 
@@ -46,7 +46,7 @@ describe AggregateRoot do
     end
   end
 
-  context "one model related to two others" do
+  context "with one model related to two others" do
     class TwoDependant
       include AggregateRoot
 
@@ -56,7 +56,7 @@ describe AggregateRoot do
         related_to: [:component_one, :component_two]
     end
 
-    it "initializes the second component with a reference to the first" do
+    it "initializes the second component with references to each of the others" do
       component_one = double("Component one")
       component_two = double("Component two")
       ComponentOne.should_receive(:new).and_return(component_one)
@@ -71,14 +71,14 @@ describe AggregateRoot do
     end
   end
 
-  context "model with alternate class" do
+  context "with a specific class" do
     class AlternateClass
       include AggregateRoot
 
       aggregates :component_one, model_class: ComponentTwo
     end
 
-    it "uses the correct class to instantiate the model" do
+    it "uses that class to instantiate the model" do
       ComponentOne.should_not_receive(:new)
       ComponentTwo.should_receive(:new).
         with(title: "Title")
@@ -87,14 +87,14 @@ describe AggregateRoot do
     end
   end
 
-  context "model with default attribute values" do
+  context "with default attribute values" do
     class DefaultValues
       include AggregateRoot
 
       aggregates :component_one, defaults: { description: "Description" }
     end
 
-    it "includes the defaults during instantiation" do
+    it "includes those defaults during instantiation" do
       ComponentOne.should_receive(:new).
         with(title: "Title", description: "Description")
 
@@ -106,6 +106,28 @@ describe AggregateRoot do
         with(description: "Other description")
 
       DefaultValues.new(component_one_description: "Other description")
+    end
+  end
+
+  context "with conditional inclusion" do
+    class ConditionalComponent
+      include AggregateRoot
+
+      aggregates :component_one,
+        if: ->(attrs) { attrs.key?(:title) }
+    end
+
+    it "instantiates the component when the condition is true" do
+      ComponentOne.should_receive(:new).
+        with(title: "Title")
+
+      ConditionalComponent.new(component_one_title: "Title")
+    end
+
+    it "does not instantiate the component when the condition is false" do
+      ComponentOne.should_not_receive(:new)
+
+      ConditionalComponent.new
     end
   end
 end
