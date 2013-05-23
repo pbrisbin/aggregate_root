@@ -62,6 +62,26 @@ describe AggregateRoot do
     end
   end
 
+  context "with a whitelist of attributes" do
+    class Whitelisted
+      include AggregateRoot
+
+      aggregates :component_one,
+        only: [:title]
+    end
+
+    it "ignores any attributes not listed" do
+      ComponentOne.should_receive(:new).
+        with(title: "Title")
+
+      whitelisted = Whitelisted.new(
+        component_one_title: "Title",
+        component_one_description: "Description",
+      )
+      expect(whitelisted).to_not respond_to(:component_one_description)
+    end
+  end
+
   context "with one model related to another" do
     class Dependant
       include AggregateRoot

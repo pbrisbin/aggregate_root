@@ -7,7 +7,7 @@ module AggregateRoot
       @name = name
       @model = model
 
-      @attributes = Attributes.new(name)
+      @attributes = Attributes.new(name, options[:only])
       @relations  = Relations.new(aggregate, options[:related_to])
       @condition  = options[:if]
       @defaults   = options.fetch(:defaults, {})

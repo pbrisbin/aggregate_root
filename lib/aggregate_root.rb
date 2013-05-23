@@ -9,9 +9,7 @@ module AggregateRoot
   end
 
   def initialize(attributes = {})
-    attributes.each do |attribute, value|
-      send(:"#{attribute}=", value)
-    end
+    assign_attributes(attributes)
 
     builders.each do |builder|
       builder.build(attributes)
@@ -24,11 +22,22 @@ module AggregateRoot
     self.class.builders
   end
 
+  def assign_attributes(attributes)
+    attributes.each do |attribute, value|
+      writer = :"#{attribute}="
+
+      if respond_to?(writer)
+        send(:"#{attribute}=", value)
+      end
+    end
+  end
+
   module ClassMethods
     def aggregates(name, options = {})
       model = options.delete(:model_class) || Model.for(name)
-      model.attributes.each do |attr|
-        attr_accessor :"#{name}_#{attr}"
+      accessors = options.fetch(:only) { model.attributes }
+      accessors.each do |accessor|
+        attr_accessor :"#{name}_#{accessor}"
       end
 
       builders << Builder.new(self, name, model, options)
