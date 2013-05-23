@@ -6,10 +6,10 @@ require 'aggregate_root/version'
 Gem::Specification.new do |spec|
   spec.name          = "aggregate_root"
   spec.version       = AggregateRoot::VERSION
-  spec.authors       = ["TODO: Write your name"]
-  spec.email         = ["TODO: Write your email address"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.authors       = ["Patrick Brisbin"]
+  spec.email         = ["pbrisbin@gmail.com"]
+  spec.description   = %q{}
+  spec.summary       = %q{}
   spec.homepage      = ""
   spec.license       = "MIT"
 
