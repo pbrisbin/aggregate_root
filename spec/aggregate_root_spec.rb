@@ -86,4 +86,26 @@ describe AggregateRoot do
       AlternateClass.new(component_one_title: "Title")
     end
   end
+
+  context "model with default attribute values" do
+    class DefaultValues
+      include AggregateRoot
+
+      aggregates :component_one, defaults: { description: "Description" }
+    end
+
+    it "includes the defaults during instantiation" do
+      ComponentOne.should_receive(:new).
+        with(title: "Title", description: "Description")
+
+      DefaultValues.new(component_one_title: "Title")
+    end
+
+    it "allows the defaults to be overriden" do
+      ComponentOne.should_receive(:new).
+        with(description: "Other description")
+
+      DefaultValues.new(component_one_description: "Other description")
+    end
+  end
 end
