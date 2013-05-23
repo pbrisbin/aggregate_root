@@ -3,14 +3,14 @@ module AggregateRoot
 
     attr_reader :name, :instance
 
-    def initialize(aggregate, name, options)
+    def initialize(aggregate, name, model, options)
       @name = name
+      @model = model
 
       @attributes = Attributes.new(name)
       @relations  = Relations.new(aggregate, options[:related_to])
       @condition  = options[:if]
       @defaults   = options.fetch(:defaults, {})
-      @model      = options.fetch(:model_class) { Model.for(name) }
     end
 
     def build(prefixed_attributes)

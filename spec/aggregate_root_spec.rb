@@ -1,9 +1,29 @@
 require 'spec_helper'
 
 describe AggregateRoot do
-  class ComponentOne; end
-  class ComponentTwo; end
-  class ComponentThree; end
+  class MockComponent
+    def self.attributes
+      []
+    end
+
+    def initialize(options = {})
+    end
+  end
+
+  class ComponentOne < MockComponent
+    def self.attributes
+      [:title, :description]
+    end
+  end
+
+  class ComponentTwo < MockComponent
+    def self.attributes
+      [:name, :description]
+    end
+  end
+
+  class ComponentThree < MockComponent
+  end
 
   context "of simple models" do
     class Simple
@@ -25,6 +45,20 @@ describe AggregateRoot do
         component_two_name: "Name",
         component_two_description: "Description Two"
       )
+    end
+
+    it "sets those attributes on the aggregate class" do
+      simple = Simple.new(
+        component_one_title: "Title",
+        component_one_description: "Description",
+        component_two_name: "Name",
+        component_two_description: "Description Two"
+      )
+
+      expect(simple.component_one_title).to eq "Title"
+      expect(simple.component_one_description).to eq "Description"
+      expect(simple.component_two_name).to eq "Name"
+      expect(simple.component_two_description).to eq "Description Two"
     end
   end
 
@@ -81,9 +115,9 @@ describe AggregateRoot do
     it "uses that class to instantiate the model" do
       ComponentOne.should_not_receive(:new)
       ComponentTwo.should_receive(:new).
-        with(title: "Title")
+        with(name: "Name")
 
-      AlternateClass.new(component_one_title: "Title")
+      AlternateClass.new(component_one_name: "Name")
     end
   end
 
